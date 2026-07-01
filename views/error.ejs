@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head', { pageTitle: 'Error - Codeverso' }) %>
+</head>
+<body>
+  <%- include('partials/nav', { user: typeof user !== 'undefined' ? user : null, active: '' }) %>
+  <main class="error-page">
+    <h1>Ups</h1>
+    <p><%= message %></p>
+    <a href="/" class="btn-primary">Volver al inicio</a>
+  </main>
+</body>
+</html>

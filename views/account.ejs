@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head', { pageTitle: 'Mi cuenta - Codeverso' }) %>
+</head>
+<body>
+  <%- include('partials/nav', { user: user, active: 'cuenta' }) %>
+
+  <main class="account-layout">
+    <section class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-value"><%= totalCompleted %></span>
+        <span class="stat-label">Ejercicios resueltos</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value"><%= savedCodesCount %></span>
+        <span class="stat-label">Codigos guardados</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value"><%= streak %></span>
+        <span class="stat-label">Dias seguidos practicando</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value"><%= goals.length %></span>
+        <span class="stat-label">Lenguajes por aprender</span>
+      </div>
+    </section>
+
+    <section class="account-section">
+      <h3>Actividad reciente</h3>
+      <div id="activity-chart" class="chart-box"></div>
+    </section>
+
+    <section class="account-section">
+      <h3>Progreso por lenguaje</h3>
+      <table class="data-table">
+        <thead><tr><th>Lenguaje</th><th>Completados</th><th>Intentados</th></tr></thead>
+        <tbody>
+          <% exercisesByLang.forEach(function(row) { %>
+          <tr><td><%= row.language_slug %></td><td><%= row.completados %></td><td><%= row.intentados %></td></tr>
+          <% }) %>
+          <% if (exercisesByLang.length === 0) { %>
+          <tr><td colspan="3" class="empty-row">Todavia no resolviste ejercicios. Anda a "Ejercicios aleatorios" para empezar.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="account-section two-col">
+      <div>
+        <h3>Mis proyectos</h3>
+        <form method="POST" action="/cuenta/proyectos" class="inline-form">
+          <input type="text" name="name" placeholder="Nombre del proyecto" required>
+          <input type="text" name="language_slug" placeholder="Lenguaje (opcional)">
+          <select name="status">
+            <option value="idea">Idea</option>
+            <option value="en_progreso">En progreso</option>
+            <option value="terminado">Terminado</option>
+          </select>
+          <input type="text" name="description" placeholder="Descripcion (opcional)">
+          <button type="submit" class="btn-primary">Agregar</button>
+        </form>
+        <ul class="item-list">
+          <% projects.forEach(function(p) { %>
+          <li>
+            <div>
+              <strong><%= p.name %></strong> <span class="tag"><%= p.status %></span>
+              <% if (p.language_slug) { %><span class="tag"><%= p.language_slug %></span><% } %>
+              <% if (p.description) { %><p class="item-desc"><%= p.description %></p><% } %>
+            </div>
+            <form method="POST" action="/cuenta/proyectos/<%= p.id %>/eliminar">
+              <button type="submit" class="btn-link">Eliminar</button>
+            </form>
+          </li>
+          <% }) %>
+        </ul>
+      </div>
+
+      <div>
+        <h3>Lenguajes que quiero aprender</h3>
+        <form method="POST" action="/cuenta/objetivos" class="inline-form">
+          <input type="text" name="language_slug" placeholder="Lenguaje" required>
+          <select name="priority">
+            <option value="alta">Prioridad alta</option>
+            <option value="media" selected>Prioridad media</option>
+            <option value="baja">Prioridad baja</option>
+          </select>
+          <input type="text" name="notes" placeholder="Notas (opcional)">
+          <button type="submit" class="btn-primary">Agregar</button>
+        </form>
+        <ul class="item-list">
+          <% goals.forEach(function(g) { %>
+          <li>
+            <div>
+              <strong><%= g.language_slug %></strong> <span class="tag"><%= g.priority %></span>
+              <% if (g.notes) { %><p class="item-desc"><%= g.notes %></p><% } %>
+            </div>
+            <form method="POST" action="/cuenta/objetivos/<%= g.id %>/eliminar">
+              <button type="submit" class="btn-link">Eliminar</button>
+            </form>
+          </li>
+          <% }) %>
+        </ul>
+      </div>
+    </section>
+
+    <section class="account-section">
+      <h3>Errores que cometi</h3>
+      <ul class="item-list">
+        <% errorsLog.forEach(function(e) { %>
+        <li>
+          <div>
+            <strong><%= e.language_slug %></strong>
+            <p class="item-desc"><%= e.description %></p>
+            <% if (e.code_snippet) { %><pre class="error-snippet"><%= e.code_snippet %></pre><% } %>
+          </div>
+          <form method="POST" action="/cuenta/errores/<%= e.id %>/eliminar">
+            <button type="submit" class="btn-link">Eliminar</button>
+          </form>
+        </li>
+        <% }) %>
+        <% if (errorsLog.length === 0) { %>
+        <li class="empty-row">Todavia no guardaste ningun error. Se van a ir sumando desde "Ejercicios aleatorios".</li>
+        <% } %>
+      </ul>
+    </section>
+
+    <section class="account-section">
+      <h3>Cambiar contrasena</h3>
+      <form method="POST" action="/cuenta/perfil/password" class="inline-form">
+        <input type="password" name="current_password" placeholder="Contrasena actual" required>
+        <input type="password" name="new_password" placeholder="Contrasena nueva" required minlength="4">
+        <button type="submit" class="btn-secondary">Actualizar</button>
+      </form>
+    </section>
+  </main>
+
+  <script>window.CODEVERSO_ACTIVITY = <%- JSON.stringify(recentActivity) %>;</script>
+  <script src="/js/charts.js"></script>
+  <script src="/js/account.js"></script>
+</body>
+</html>

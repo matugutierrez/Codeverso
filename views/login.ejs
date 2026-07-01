@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head', { pageTitle: 'Ingresar - Codeverso' }) %>
+</head>
+<body class="auth-body">
+  <div class="auth-card">
+    <div class="auth-logo">&lt;/&gt; Codeverso</div>
+    <p class="auth-subtitle">Tu espacio para practicar y crecer en programacion</p>
+    <% if (error) { %><div class="auth-error"><%= error %></div><% } %>
+    <form method="POST" action="/login" class="auth-form">
+      <label>Usuario</label>
+      <input type="text" name="username" required autofocus>
+      <label>Contrasena</label>
+      <input type="password" name="password" required>
+      <button type="submit" class="btn-primary">Ingresar</button>
+    </form>
+    <p class="auth-switch">No tenes cuenta? <a href="/registro">Registrate</a></p>
+  </div>
+</body>
+</html>

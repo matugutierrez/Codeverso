@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head', { pageTitle: 'Codear libremente - Codeverso' }) %>
+</head>
+<body>
+  <%- include('partials/nav', { user: user, active: 'codear' }) %>
+
+  <main class="editor-layout">
+    <aside class="editor-sidebar">
+      <div class="sidebar-section">
+        <h3>Mis codigos guardados</h3>
+        <ul id="saved-codes-list" class="saved-codes-list">
+          <% savedCodes.forEach(function(c) { %>
+          <li data-id="<%= c.id %>" data-lang="<%= c.language_slug %>" class="saved-code-item">
+            <span class="saved-code-title"><%= c.title %></span>
+            <span class="saved-code-lang"><%= c.language_slug %></span>
+            <button class="saved-code-delete" title="Eliminar">&times;</button>
+          </li>
+          <% }) %>
+          <% if (savedCodes.length === 0) { %>
+          <li class="saved-codes-empty">Todavia no guardaste ningun codigo.</li>
+          <% } %>
+        </ul>
+      </div>
+    </aside>
+
+    <section class="editor-main">
+      <div class="editor-toolbar">
+        <div class="toolbar-group">
+          <label for="language-select">Lenguaje</label>
+          <input list="language-options" id="language-select" placeholder="Buscar lenguaje..." autocomplete="off">
+          <datalist id="language-options"></datalist>
+        </div>
+        <div class="toolbar-group toolbar-toggle">
+          <label for="indent-help-toggle">Ayuda de indentacion</label>
+          <input type="checkbox" id="indent-help-toggle" checked>
+        </div>
+        <div class="toolbar-group toolbar-toggle">
+          <label for="autoclose-toggle">Autocerrar simbolos</label>
+          <input type="checkbox" id="autoclose-toggle" checked>
+        </div>
+        <div class="toolbar-spacer"></div>
+        <input type="text" id="code-title" class="code-title-input" placeholder="Titulo del codigo" value="Sin titulo">
+        <button id="btn-save" class="btn-secondary">Guardar</button>
+        <button id="btn-save-as" class="btn-primary">Guardar como</button>
+      </div>
+
+      <div class="editor-info">
+        <span id="language-info-name">JavaScript</span>
+        <span id="language-info-detail">indentacion: 2 espacios</span>
+      </div>
+
+      <div class="code-editor-wrapper" id="code-editor-wrapper">
+        <div class="line-numbers" id="line-numbers">1</div>
+        <pre class="highlight-layer" id="highlight-layer"><code id="highlight-code"></code></pre>
+        <textarea id="code-input" class="code-input" spellcheck="false" wrap="off"></textarea>
+      </div>
+
+      <div class="editor-status" id="editor-status"></div>
+    </section>
+  </main>
+
+  <script>window.CODEVERSO_DEFAULT_LANG = <%- JSON.stringify(defaultLanguage) %>;</script>
+  <script src="/js/highlight.js"></script>
+  <script src="/js/editor.js"></script>
+</body>
+</html>

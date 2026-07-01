@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head', { pageTitle: 'Crear cuenta - Codeverso' }) %>
+</head>
+<body class="auth-body">
+  <div class="auth-card">
+    <div class="auth-logo">&lt;/&gt; Codeverso</div>
+    <p class="auth-subtitle">Crea tu cuenta y empeza a practicar hoy</p>
+    <% if (error) { %><div class="auth-error"><%= error %></div><% } %>
+    <form method="POST" action="/registro" class="auth-form">
+      <label>Nombre completo</label>
+      <input type="text" name="full_name" required autofocus>
+      <label>Usuario</label>
+      <input type="text" name="username" required>
+      <label>Email (opcional)</label>
+      <input type="email" name="email">
+      <label>Contrasena</label>
+      <input type="password" name="password" required minlength="4">
+      <button type="submit" class="btn-primary">Crear cuenta</button>
+    </form>
+    <p class="auth-switch">Ya tenes cuenta? <a href="/login">Ingresa</a></p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head', { pageTitle: 'Ejercicios aleatorios - Codeverso' }) %>
+</head>
+<body>
+  <%- include('partials/nav', { user: user, active: 'ejercicios' }) %>
+
+  <main class="exercises-layout">
+    <div class="exercises-controls">
+      <div class="toolbar-group">
+        <label for="ex-language-select">Lenguaje</label>
+        <input list="ex-language-options" id="ex-language-select" placeholder="Elegi un lenguaje..." autocomplete="off">
+        <datalist id="ex-language-options"></datalist>
+      </div>
+      <div class="toolbar-group">
+        <label for="ex-difficulty-select">Dificultad</label>
+        <select id="ex-difficulty-select">
+          <option value="todas">Todas</option>
+          <option value="facil">Facil</option>
+          <option value="media">Media</option>
+          <option value="dificil">Dificil</option>
+        </select>
+      </div>
+      <button id="btn-nuevo-ejercicio" class="btn-primary">Tirame un ejercicio</button>
+      <button id="btn-skip" class="btn-secondary" disabled>Skipear</button>
+      <button id="btn-mas-dificil" class="btn-secondary" disabled>Mas dificil</button>
+      <button id="btn-menos-dificil" class="btn-secondary" disabled>Menos dificil</button>
+    </div>
+
+    <div id="exercise-empty" class="exercise-card exercise-empty">
+      <p>Elegi un lenguaje y una dificultad, despues toca "Tirame un ejercicio" para empezar a practicar.</p>
+    </div>
+
+    <div id="exercise-card" class="exercise-card" style="display:none">
+      <div class="exercise-head">
+        <span id="exercise-badge-type" class="badge"></span>
+        <span id="exercise-badge-diff" class="badge"></span>
+        <h2 id="exercise-title"></h2>
+      </div>
+      <p id="exercise-statement" class="exercise-statement"></p>
+
+      <div class="code-editor-wrapper exercise-editor-wrapper">
+        <div class="line-numbers" id="ex-line-numbers">1</div>
+        <pre class="highlight-layer" id="ex-highlight-layer"><code id="ex-highlight-code"></code></pre>
+        <textarea id="ex-code-input" class="code-input" spellcheck="false" wrap="off"></textarea>
+      </div>
+
+      <div class="exercise-actions">
+        <button id="btn-marcar-completado" class="btn-primary">Marcar como resuelto</button>
+        <button id="btn-ver-tips" class="btn-secondary">Ver tips y errores comunes</button>
+        <button id="btn-reportar-error" class="btn-secondary">Guardar como error que cometi</button>
+      </div>
+
+      <div id="exercise-tips" class="exercise-tips" style="display:none">
+        <h4>Tips</h4>
+        <ul id="tips-list"></ul>
+        <h4>Errores comunes</h4>
+        <ul id="errors-list"></ul>
+        <h4>Pista de solucion</h4>
+        <p id="solution-hint"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>window.CODEVERSO_EXERCISE_LANGUAGES = <%- JSON.stringify(availableLanguages) %>;</script>
+  <script src="/js/highlight.js"></script>
+  <script src="/js/exercises.js"></script>
+</body>
+</html>

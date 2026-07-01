@@ -1,0 +1,19 @@
+<header class="nav">
+  <div class="nav-brand">
+    <span class="nav-logo">&lt;/&gt;</span>
+    <span class="nav-title">Codeverso</span>
+  </div>
+  <% if (typeof user !== 'undefined' && user) { %>
+  <nav class="nav-links">
+    <a href="/codear" class="<%= active === 'codear' ? 'active' : '' %>">Codear libremente</a>
+    <a href="/ejercicios" class="<%= active === 'ejercicios' ? 'active' : '' %>">Ejercicios aleatorios</a>
+    <a href="/cuenta" class="<%= active === 'cuenta' ? 'active' : '' %>">Mi cuenta</a>
+  </nav>
+  <div class="nav-user">
+    <span class="nav-username"><%= user.fullName %></span>
+    <form action="/logout" method="POST">
+      <button type="submit" class="btn-link">Salir</button>
+    </form>
+  </div>
+  <% } %>
+</header>
