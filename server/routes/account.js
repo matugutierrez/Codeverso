@@ -23,7 +23,7 @@ router.get('/', requireAuth, async (req, res) => {
   const activity = await query('SELECT activity_date FROM activity_log WHERE user_id = $1', [userId])
   const streak = computeStreak(activity.rows.map((r) => r.activity_date))
 
-  const projects = await query('SELECT * FROM projects WHERE user_id = $1 ORDER BY updated_at DESC', [userId])
+  const projects = await query('SELECT * FROM codeverso_projects WHERE user_id = $1 ORDER BY updated_at DESC', [userId])
   const goals = await query('SELECT * FROM learning_goals WHERE user_id = $1 ORDER BY created_at DESC', [userId])
   const errorsLog = await query('SELECT * FROM user_errors_log WHERE user_id = $1 ORDER BY created_at DESC LIMIT 25', [userId])
 
@@ -47,19 +47,19 @@ router.get('/', requireAuth, async (req, res) => {
 router.post('/proyectos', requireAuth, async (req, res) => {
   const { name, description, language_slug, status } = req.body
   await query(
-    'INSERT INTO projects (user_id, name, description, language_slug, status) VALUES ($1,$2,$3,$4,$5)',
+    'INSERT INTO codeverso_projects (user_id, name, description, language_slug, status) VALUES ($1,$2,$3,$4,$5)',
     [req.session.user.id, name, description || null, language_slug || null, status || 'idea']
   )
   res.redirect('/cuenta')
 })
 
 router.post('/proyectos/:id/estado', requireAuth, async (req, res) => {
-  await query('UPDATE projects SET status = $1, updated_at = now() WHERE id = $2 AND user_id = $3', [req.body.status, req.params.id, req.session.user.id])
+  await query('UPDATE codeverso_projects SET status = $1, updated_at = now() WHERE id = $2 AND user_id = $3', [req.body.status, req.params.id, req.session.user.id])
   res.redirect('/cuenta')
 })
 
 router.post('/proyectos/:id/eliminar', requireAuth, async (req, res) => {
-  await query('DELETE FROM projects WHERE id = $1 AND user_id = $2', [req.params.id, req.session.user.id])
+  await query('DELETE FROM codeverso_projects WHERE id = $1 AND user_id = $2', [req.params.id, req.session.user.id])
   res.redirect('/cuenta')
 })
 

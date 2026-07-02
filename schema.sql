@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS user_errors_log (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS projects (
+CREATE TABLE IF NOT EXISTS codeverso_projects (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
@@ -83,6 +83,6 @@ CREATE INDEX IF NOT EXISTS idx_saved_codes_user ON saved_codes(user_id);
 CREATE INDEX IF NOT EXISTS idx_exercises_lang_diff ON exercises(language_slug, difficulty);
 CREATE INDEX IF NOT EXISTS idx_progress_user ON user_exercise_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_errors_user ON user_errors_log(user_id);
-CREATE INDEX IF NOT EXISTS idx_projects_user ON projects(user_id);
+CREATE INDEX IF NOT EXISTS idx_codeverso_projects_user ON codeverso_projects(user_id);
 CREATE INDEX IF NOT EXISTS idx_goals_user ON learning_goals(user_id);
 CREATE INDEX IF NOT EXISTS idx_activity_user ON activity_log(user_id);
