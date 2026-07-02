@@ -86,3 +86,5 @@ CREATE INDEX IF NOT EXISTS idx_errors_user ON user_errors_log(user_id);
 CREATE INDEX IF NOT EXISTS idx_codeverso_projects_user ON codeverso_projects(user_id);
 CREATE INDEX IF NOT EXISTS idx_goals_user ON learning_goals(user_id);
 CREATE INDEX IF NOT EXISTS idx_activity_user ON activity_log(user_id);
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT;

@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express')
+require('express-async-errors')
 const path = require('path')
 const session = require('express-session')
 const pgSession = require('connect-pg-simple')(session)
@@ -45,10 +46,6 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error(err)
   res.status(500).render('error', { message: 'Ocurrio un error inesperado' })
-})
-
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason)
 })
 
 const port = process.env.PORT || 3000
