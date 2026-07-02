@@ -29,8 +29,10 @@
       <div class="editor-toolbar">
         <div class="toolbar-group">
           <label for="language-select">Lenguaje</label>
-          <input list="language-options" id="language-select" placeholder="Buscar lenguaje..." autocomplete="off">
-          <datalist id="language-options"></datalist>
+          <div class="lang-dropdown">
+            <input id="language-select" class="lang-dropdown-input" placeholder="Buscar lenguaje..." autocomplete="off">
+            <div id="language-select-menu" class="lang-dropdown-menu"></div>
+          </div>
         </div>
         <div class="toolbar-group toolbar-toggle">
           <label for="indent-help-toggle">Ayuda de indentacion</label>
@@ -63,6 +65,7 @@
 
   <script>window.CODEVERSO_DEFAULT_LANG = <%- JSON.stringify(defaultLanguage) %>;</script>
   <script src="/js/highlight.js"></script>
+  <script src="/js/lang-dropdown.js"></script>
   <script src="/js/editor.js"></script>
 </body>
 </html>

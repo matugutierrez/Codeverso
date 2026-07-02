@@ -249,7 +249,7 @@
 
   async function init() {
     els.langSelect = $('language-select')
-    els.langOptions = $('language-options')
+    els.langMenu = $('language-select-menu')
     els.indentToggle = $('indent-help-toggle')
     els.autoCloseToggle = $('autoclose-toggle')
     els.titleInput = $('code-title')
@@ -267,17 +267,24 @@
     state.languages.forEach((l) => {
       state.byName.set(l.name.toLowerCase(), l)
       state.bySlug.set(l.slug.toLowerCase(), l)
-      const opt = document.createElement('option')
-      opt.value = l.name
-      els.langOptions.appendChild(opt)
     })
 
     const initial = state.bySlug.get((window.CODEVERSO_DEFAULT_LANG || 'javascript').toLowerCase()) || state.languages[0]
     applyLanguage(initial, false)
 
-    els.langSelect.addEventListener('change', () => {
-      const found = resolveLanguageFromInput(els.langSelect.value)
-      if (found) applyLanguage(found, true)
+    window.CodeversoLangDropdown.create({
+      inputEl: els.langSelect,
+      menuEl: els.langMenu,
+      languages: state.languages,
+      onSelect: (found) => applyLanguage(found, true)
+    })
+
+    els.langSelect.addEventListener('blur', () => {
+      setTimeout(() => {
+        const found = resolveLanguageFromInput(els.langSelect.value)
+        if (found && found !== state.current) applyLanguage(found, true)
+        else if (state.current) els.langSelect.value = state.current.name
+      }, 150)
     })
 
     els.indentToggle.addEventListener('change', () => { state.indentHelp = els.indentToggle.checked })

@@ -125,7 +125,7 @@
 
   async function init() {
     els.langSelect = $('ex-language-select')
-    els.langOptions = $('ex-language-options')
+    els.langMenu = $('ex-language-select-menu')
     els.difficultySelect = $('ex-difficulty-select')
     els.btnNuevo = $('btn-nuevo-ejercicio')
     els.btnSkip = $('btn-skip')
@@ -148,9 +148,13 @@
     state.languages.forEach((l) => {
       state.byName.set(l.name.toLowerCase(), l)
       state.bySlug.set(l.slug.toLowerCase(), l)
-      const opt = document.createElement('option')
-      opt.value = l.name
-      els.langOptions.appendChild(opt)
+    })
+
+    window.CodeversoLangDropdown.create({
+      inputEl: els.langSelect,
+      menuEl: els.langMenu,
+      languages: state.languages,
+      onSelect: () => {}
     })
 
     els.btnNuevo.addEventListener('click', () => { state.seenIds = []; fetchExercise() })

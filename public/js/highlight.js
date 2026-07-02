@@ -1,4 +1,6 @@
 (function () {
+  const CONSTANT_WORDS = new Set(['true', 'false', 'null', 'undefined', 'none', 'nil', 'nullptr'])
+
   function escapeRegExp(s) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   }
@@ -29,6 +31,11 @@
       groups.push('(?<str' + idx + '>' + esc + '(?:\\\\.|[^\\\\' + esc + '])*' + esc + ')')
     })
 
+    const isStyle = config.extension === 'css' || config.extension === 'scss' || config.slug === 'css'
+    if (isStyle) {
+      groups.push('(?<hexcolor>#[0-9a-fA-F]{3,8}\\b)')
+    }
+
     groups.push('(?<number>\\b\\d+(?:\\.\\d+)?\\b)')
 
     const isMarkup = config.extension === 'html' || config.extension === 'xml' || config.slug === 'xml'
@@ -53,11 +60,12 @@
     return new RegExp(groups.join('|'), 'g')
   }
 
-  function classFor(groupName) {
+  function classFor(groupName, text) {
     if (groupName === 'comment' || groupName === 'linecomment') return 'tok-comment'
     if (groupName.indexOf('str') === 0 || groupName.indexOf('triple') === 0) return 'tok-string'
+    if (groupName === 'hexcolor') return 'tok-hexcolor'
     if (groupName === 'number') return 'tok-number'
-    if (groupName === 'keyword') return 'tok-keyword'
+    if (groupName === 'keyword') return CONSTANT_WORDS.has((text || '').toLowerCase()) ? 'tok-constant' : 'tok-keyword'
     if (groupName === 'type') return 'tok-type'
     if (groupName === 'func') return 'tok-function'
     if (groupName === 'tag') return 'tok-tag'
@@ -89,14 +97,19 @@
       }
       const groups = match.groups || {}
       let cls = null
+      let rawText = match[0]
       for (const key in groups) {
         if (groups[key] !== undefined) {
-          cls = classFor(key)
+          cls = classFor(key, groups[key])
           break
         }
       }
-      const text = escapeHtml(match[0])
-      out += cls ? '<span class="' + cls + '">' + text + '</span>' : text
+      const text = escapeHtml(rawText)
+      if (cls === 'tok-hexcolor') {
+        out += '<span class="tok-hexcolor"><span class="tok-color-swatch" style="background:' + text + '"></span>' + text + '</span>'
+      } else {
+        out += cls ? '<span class="' + cls + '">' + text + '</span>' : text
+      }
       lastIndex = match.index + match[0].length
       if (match[0].length === 0) regex.lastIndex++
     }

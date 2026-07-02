@@ -10,8 +10,10 @@
     <div class="exercises-controls">
       <div class="toolbar-group">
         <label for="ex-language-select">Lenguaje</label>
-        <input list="ex-language-options" id="ex-language-select" placeholder="Elegi un lenguaje..." autocomplete="off">
-        <datalist id="ex-language-options"></datalist>
+        <div class="lang-dropdown">
+          <input id="ex-language-select" class="lang-dropdown-input" placeholder="Elegi un lenguaje..." autocomplete="off">
+          <div id="ex-language-select-menu" class="lang-dropdown-menu"></div>
+        </div>
       </div>
       <div class="toolbar-group">
         <label for="ex-difficulty-select">Dificultad</label>
@@ -65,6 +67,7 @@
 
   <script>window.CODEVERSO_EXERCISE_LANGUAGES = <%- JSON.stringify(availableLanguages) %>;</script>
   <script src="/js/highlight.js"></script>
+  <script src="/js/lang-dropdown.js"></script>
   <script src="/js/exercises.js"></script>
 </body>
 </html>
