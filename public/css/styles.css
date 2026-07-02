@@ -121,7 +121,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); }
 }
 .line-numbers { padding: 16px 10px; text-align: right; color: #4b4e6d; user-select: none; background: #14152080; min-width: 46px; white-space: pre; font: inherit; }
 .highlight-layer { position: absolute; left: 56px; top: 0; right: 0; bottom: 0; margin: 0; padding: 16px 20px; pointer-events: none; white-space: pre; overflow: hidden; color: #cdd6f4; font: inherit; letter-spacing: inherit; }
-.code-input { position: relative; left: 56px; width: calc(100% - 56px); min-height: 100%; background: transparent; color: transparent; caret-color: #f5f5f5; border: none; resize: none; padding: 16px 20px; font: inherit; letter-spacing: inherit; white-space: pre; overflow: auto; z-index: 1; }
+.code-input { position: absolute; left: 56px; right: 0; top: 0; bottom: 0; min-height: 100%; background: transparent; color: transparent; caret-color: #f5f5f5; border: none; resize: none; padding: 16px 20px; font: inherit; letter-spacing: inherit; white-space: pre; overflow: auto; z-index: 1; box-sizing: border-box; }
 .code-input:focus { outline: none; }
 
 .tok-keyword { color: #cba6f7; font-weight: 600; }
