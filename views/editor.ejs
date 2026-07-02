@@ -55,11 +55,13 @@
 
       <div class="code-editor-wrapper" id="code-editor-wrapper">
         <div class="line-numbers" id="line-numbers">1</div>
-        <div class="editor-overlay current-line-overlay" id="current-line-overlay"></div>
-        <div class="editor-overlay indent-guides-overlay" id="indent-guides-overlay"></div>
-        <div class="editor-overlay bracket-match-overlay" id="bracket-match-overlay"></div>
-        <pre class="highlight-layer" id="highlight-layer"><code id="highlight-code"></code></pre>
-        <textarea id="code-input" class="code-input" spellcheck="false" wrap="off"></textarea>
+        <div class="editor-area">
+          <div class="editor-overlay current-line-overlay" id="current-line-overlay"></div>
+          <div class="editor-overlay indent-guides-overlay" id="indent-guides-overlay"></div>
+          <div class="editor-overlay bracket-match-overlay" id="bracket-match-overlay"></div>
+          <pre class="highlight-layer" id="highlight-layer"><code id="highlight-code"></code></pre>
+          <textarea id="code-input" class="code-input" spellcheck="false" wrap="off"></textarea>
+        </div>
       </div>
 
       <div class="editor-status" id="editor-status"></div>
