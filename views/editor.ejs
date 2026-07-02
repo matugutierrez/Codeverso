@@ -55,6 +55,9 @@
 
       <div class="code-editor-wrapper" id="code-editor-wrapper">
         <div class="line-numbers" id="line-numbers">1</div>
+        <div class="editor-overlay current-line-overlay" id="current-line-overlay"></div>
+        <div class="editor-overlay indent-guides-overlay" id="indent-guides-overlay"></div>
+        <div class="editor-overlay bracket-match-overlay" id="bracket-match-overlay"></div>
         <pre class="highlight-layer" id="highlight-layer"><code id="highlight-code"></code></pre>
         <textarea id="code-input" class="code-input" spellcheck="false" wrap="off"></textarea>
       </div>
@@ -66,6 +69,7 @@
   <script>window.CODEVERSO_DEFAULT_LANG = <%- JSON.stringify(defaultLanguage) %>;</script>
   <script src="/js/highlight.js"></script>
   <script src="/js/lang-dropdown.js"></script>
+  <script src="/js/editor-enhancements.js"></script>
   <script src="/js/editor.js"></script>
 </body>
 </html>

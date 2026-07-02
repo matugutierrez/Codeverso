@@ -22,12 +22,36 @@
     let out = ''
     for (let i = 1; i <= lineCount; i++) out += i + '\n'
     els.exLineNumbers.textContent = out.trim().length ? out : '1'
+    syncScroll()
+    if (state.enhancements) state.enhancements.render()
   }
 
-  function syncScroll() {
+  function applyScrollSync() {
     els.exHighlightLayer.scrollTop = els.exCodeInput.scrollTop
     els.exHighlightLayer.scrollLeft = els.exCodeInput.scrollLeft
     els.exLineNumbers.scrollTop = els.exCodeInput.scrollTop
+    if (els.exCurrentLineOverlay) els.exCurrentLineOverlay.scrollTop = els.exCodeInput.scrollTop
+    if (els.exIndentGuidesOverlay) {
+      els.exIndentGuidesOverlay.scrollTop = els.exCodeInput.scrollTop
+      els.exIndentGuidesOverlay.scrollLeft = els.exCodeInput.scrollLeft
+    }
+    if (els.exBracketMatchOverlay) {
+      els.exBracketMatchOverlay.scrollTop = els.exCodeInput.scrollTop
+      els.exBracketMatchOverlay.scrollLeft = els.exCodeInput.scrollLeft
+    }
+  }
+
+  // See editor.js for why this two-step (immediate + next-frame) resync is
+  // needed: the browser's own caret-follow scroll can land a frame after
+  // 'input' fires, so a single synchronous read can go stale and drift.
+  let pendingScrollSync = null
+  function syncScroll() {
+    applyScrollSync()
+    if (pendingScrollSync) cancelAnimationFrame(pendingScrollSync)
+    pendingScrollSync = requestAnimationFrame(() => {
+      pendingScrollSync = null
+      applyScrollSync()
+    })
   }
 
   function setButtonsEnabled(enabled) {
@@ -137,6 +161,17 @@
     els.exHighlightLayer = $('ex-highlight-layer')
     els.exHighlightCode = $('ex-highlight-code')
     els.exLineNumbers = $('ex-line-numbers')
+    els.exCurrentLineOverlay = $('ex-current-line-overlay')
+    els.exIndentGuidesOverlay = $('ex-indent-guides-overlay')
+    els.exBracketMatchOverlay = $('ex-bracket-match-overlay')
+
+    state.enhancements = window.CodeversoEditorEnhancements.create({
+      textareaEl: els.exCodeInput,
+      currentLineEl: els.exCurrentLineOverlay,
+      indentGuidesEl: els.exIndentGuidesOverlay,
+      bracketMatchEl: els.exBracketMatchOverlay,
+      getConfig: () => state.current
+    })
     els.btnMarcarCompletado = $('btn-marcar-completado')
     els.btnVerTips = $('btn-ver-tips')
     els.btnReportarError = $('btn-reportar-error')
@@ -170,6 +205,12 @@
 
     els.exCodeInput.addEventListener('input', renderHighlight)
     els.exCodeInput.addEventListener('scroll', syncScroll)
+    els.exCodeInput.addEventListener('click', () => { if (state.enhancements) state.enhancements.render() })
+    els.exCodeInput.addEventListener('keyup', (e) => {
+      if (e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End') {
+        if (state.enhancements) state.enhancements.render()
+      }
+    })
     els.exCodeInput.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') {
         e.preventDefault()

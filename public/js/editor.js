@@ -36,12 +36,41 @@
     els.highlightCode.innerHTML = html + '\n'
     updateLineNumbers()
     syncScroll()
+    if (state.enhancements) state.enhancements.render()
   }
 
-  function syncScroll() {
+  function applyScrollSync() {
     els.highlightLayer.scrollTop = els.codeInput.scrollTop
     els.highlightLayer.scrollLeft = els.codeInput.scrollLeft
     els.lineNumbers.scrollTop = els.codeInput.scrollTop
+    if (els.currentLineOverlay) els.currentLineOverlay.scrollTop = els.codeInput.scrollTop
+    if (els.indentGuidesOverlay) {
+      els.indentGuidesOverlay.scrollTop = els.codeInput.scrollTop
+      els.indentGuidesOverlay.scrollLeft = els.codeInput.scrollLeft
+    }
+    if (els.bracketMatchOverlay) {
+      els.bracketMatchOverlay.scrollTop = els.codeInput.scrollTop
+      els.bracketMatchOverlay.scrollLeft = els.codeInput.scrollLeft
+    }
+  }
+
+  // When typing near the right edge, the browser scrolls the textarea
+  // internally to keep the caret visible. That internal scroll adjustment
+  // sometimes lands one frame after the 'input' event fires, so reading
+  // scrollLeft synchronously can capture a stale (too small) value. That
+  // makes the highlighted layer fall a little further behind the real
+  // caret on every keystroke, growing into a visible gap over time.
+  // Re-applying the sync on the next animation frame (after the browser
+  // has actually committed its own scroll adjustment) closes that gap
+  // every time, so it never has a chance to accumulate.
+  let pendingScrollSync = null
+  function syncScroll() {
+    applyScrollSync()
+    if (pendingScrollSync) cancelAnimationFrame(pendingScrollSync)
+    pendingScrollSync = requestAnimationFrame(() => {
+      pendingScrollSync = null
+      applyScrollSync()
+    })
   }
 
   function setStatus(msg) {
@@ -261,6 +290,17 @@
     els.lineNumbers = $('line-numbers')
     els.status = $('editor-status')
     els.savedList = $('saved-codes-list')
+    els.currentLineOverlay = $('current-line-overlay')
+    els.indentGuidesOverlay = $('indent-guides-overlay')
+    els.bracketMatchOverlay = $('bracket-match-overlay')
+
+    state.enhancements = window.CodeversoEditorEnhancements.create({
+      textareaEl: els.codeInput,
+      currentLineEl: els.currentLineOverlay,
+      indentGuidesEl: els.indentGuidesOverlay,
+      bracketMatchEl: els.bracketMatchOverlay,
+      getConfig: () => state.current
+    })
 
     const res = await fetch('/codear/api/lenguajes')
     state.languages = await res.json()
@@ -292,6 +332,12 @@
 
     els.codeInput.addEventListener('input', renderHighlight)
     els.codeInput.addEventListener('scroll', syncScroll)
+    els.codeInput.addEventListener('click', () => { if (state.enhancements) state.enhancements.render() })
+    els.codeInput.addEventListener('keyup', (e) => {
+      if (e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End') {
+        if (state.enhancements) state.enhancements.render()
+      }
+    })
 
     els.codeInput.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') return handleTabKey(e)
