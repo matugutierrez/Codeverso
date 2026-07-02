@@ -7,6 +7,10 @@ const pool = new Pool({
   ssl: useSsl ? { rejectUnauthorized: false } : false
 })
 
+pool.on('error', err => {
+  console.error('Error inesperado en el pool de Postgres:', err.message)
+})
+
 async function query(text, params) {
   return pool.query(text, params)
 }

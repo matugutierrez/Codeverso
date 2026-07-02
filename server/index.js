@@ -47,6 +47,10 @@ app.use((err, req, res, next) => {
   res.status(500).render('error', { message: 'Ocurrio un error inesperado' })
 })
 
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason)
+})
+
 const port = process.env.PORT || 3000
 app.listen(port, () => {
   console.log(`Codeverso corriendo en el puerto ${port}`)
