@@ -75,6 +75,7 @@
           <div class="editor-actions">
             <button id="regen-demo" class="btn-secondary" type="button" title="Regenerar demo.html">Generar demo.html</button>
             <button id="refresh-preview" class="btn-secondary" type="button" title="Refrescar">&#x21bb; Refrescar</button>
+            <button id="fullscreen-preview" class="btn-secondary" type="button" title="Pantalla completa">&#x26F6; Fullscreen</button>
             <a class="btn-primary" href="/proyectos/<%= project.id %>/download">Descargar .zip</a>
           </div>
         </div>
@@ -84,7 +85,10 @@
 
         <div id="local-preview-modal" class="cv-modal-overlay local-preview-modal" aria-hidden="true">
           <div class="cv-modal local-preview-card" role="dialog" aria-modal="true" aria-labelledby="local-preview-title">
-            <h3 id="local-preview-title">Este proyecto necesita correr localmente</h3>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+              <h3 id="local-preview-title" style="margin:0">Este proyecto necesita correr localmente</h3>
+              <button id="close-local-modal" type="button" aria-label="Cerrar" style="background:none;border:none;font-size:22px;cursor:pointer;color:#666;line-height:1;padding:0 2px">&times;</button>
+            </div>
             <p>No se puede convertir automaticamente en un HTML real porque necesita dependencias, build y servidor/backend. Ejecuta estos comandos en la carpeta del proyecto y despues abre la URL local aca para verlo en vivo en el recuadro.</p>
             <div class="local-command-list" id="local-command-list"></div>
             <button id="copy-local-commands" class="btn-secondary" type="button">Copiar comandos</button>
@@ -134,6 +138,8 @@
       const copyLocalCommands = document.getElementById('copy-local-commands');
       const cancelLocalPreview = document.getElementById('cancel-local-preview');
       const openLocalPreview = document.getElementById('open-local-preview');
+      const closeLocalModalBtn = document.getElementById('close-local-modal');
+      const fullscreenBtn = document.getElementById('fullscreen-preview');
 
       function renderLocalCommands(plan) {
         const commands = (plan && plan.commands && plan.commands.length) ? plan.commands : ['npm install', 'npm run build', 'npm run dev'];
@@ -169,6 +175,7 @@
           preview.onload = null;
           closeLocalModal();
         };
+        setTimeout(function () { closeLocalModal(); }, 10000);
       }
 
       if (copyLocalCommands) {
@@ -182,6 +189,17 @@
       if (cancelLocalPreview) cancelLocalPreview.addEventListener('click', closeLocalModal);
       if (openLocalPreview) openLocalPreview.addEventListener('click', openLiveLocalPreview);
       if (localModal) localModal.addEventListener('click', function (e) { if (e.target === localModal) closeLocalModal(); });
+      if (closeLocalModalBtn) closeLocalModalBtn.addEventListener('click', closeLocalModal);
+      if (fullscreenBtn) fullscreenBtn.addEventListener('click', function () {
+        const el = previewWrap || preview;
+        if (el.requestFullscreen) {
+          el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
+          el.webkitRequestFullscreen();
+        } else if (el.msRequestFullscreen) {
+          el.msRequestFullscreen();
+        }
+      });
 
       // ---- Tree collapse ----
       tree.addEventListener('click', function (e) {
