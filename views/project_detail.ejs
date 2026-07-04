@@ -81,6 +81,17 @@
         </div>
         <div class="preview-frame-wrap" id="preview-wrap" data-dev="desktop">
           <iframe id="project-preview" src="/proyectos/<%= project.id %>/preview" title="Vista previa" allowfullscreen></iframe>
+          <div class="device-floating" id="device-floating">
+            <button type="button" data-dev="desktop" class="is-active" title="Escritorio">
+              <svg viewBox="0 0 20 20" width="14" height="14"><rect x="1" y="2" width="18" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="6" y1="17" x2="14" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="10" y1="14" x2="10" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </button>
+            <button type="button" data-dev="tablet" title="Tablet">
+              <svg viewBox="0 0 20 20" width="14" height="14"><rect x="3" y="1.5" width="14" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="16" r=".9" fill="currentColor"/></svg>
+            </button>
+            <button type="button" data-dev="mobile" title="Movil">
+              <svg viewBox="0 0 20 20" width="14" height="14"><rect x="6" y="1.5" width="8" height="17" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="16" r=".9" fill="currentColor"/></svg>
+            </button>
+          </div>
         </div>
 
         <div id="local-preview-modal" class="cv-modal-overlay local-preview-modal" aria-hidden="true">
@@ -128,6 +139,7 @@
       const preview = document.getElementById('project-preview');
       const previewWrap = document.getElementById('preview-wrap');
       const deviceToggle = document.getElementById('device-toggle');
+      const deviceFloating = document.getElementById('device-floating');
       let previewPlan = <%- JSON.stringify(previewPlan || {}).replace(/</g, '\\u003c') %>;
       let currentPfId = null;
       let dirty = false;
@@ -216,12 +228,13 @@
       });
 
       // ---- Device toggle ----
-      deviceToggle.addEventListener('click', function (e) {
-        const btn = e.target.closest('button[data-dev]');
+      function setDevice(btn) {
         if (!btn) return;
-        deviceToggle.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b === btn));
+        document.querySelectorAll('[data-dev]').forEach(b => b.classList.toggle('is-active', b === btn));
         previewWrap.dataset.dev = btn.dataset.dev;
-      });
+      }
+      deviceToggle.addEventListener('click', function (e) { setDevice(e.target.closest('button[data-dev]')); });
+      if (deviceFloating) deviceFloating.addEventListener('click', function (e) { setDevice(e.target.closest('button[data-dev]')); });
 
       // ---- File drop / picker ----
       const fileInput = document.getElementById('file-input');
