@@ -8,7 +8,11 @@ const router = express.Router()
 
 router.get('/', requireAuth, async (req, res) => {
   const codes = await query(
-    'SELECT id, language_slug, title, updated_at FROM saved_codes WHERE user_id = $1 ORDER BY updated_at DESC',
+    `SELECT id, language_slug, title, updated_at
+       FROM saved_codes
+      WHERE user_id = $1
+        AND NOT EXISTS (SELECT 1 FROM project_files pf WHERE pf.code_id = saved_codes.id)
+      ORDER BY updated_at DESC`,
     [req.session.user.id]
   )
   res.render('editor', { savedCodes: codes.rows, defaultLanguage: req.query.lang || 'javascript' })
@@ -44,6 +48,16 @@ router.post('/api/codigos', requireAuth, async (req, res) => {
 router.post('/api/codigos/:id/eliminar', requireAuth, async (req, res) => {
   await query('DELETE FROM saved_codes WHERE id = $1 AND user_id = $2', [req.params.id, req.session.user.id])
   res.json({ ok: true })
+})
+
+router.post('/api/codigos/eliminar-todos', requireAuth, async (req, res) => {
+  const result = await query(
+    `DELETE FROM saved_codes
+      WHERE user_id = $1
+        AND NOT EXISTS (SELECT 1 FROM project_files pf WHERE pf.code_id = saved_codes.id)`,
+    [req.session.user.id]
+  )
+  res.json({ ok: true, deleted: result.rowCount || 0 })
 })
 
 router.get('/api/lenguajes', requireAuth, (req, res) => {

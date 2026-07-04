@@ -9,7 +9,10 @@
   <main class="editor-layout">
     <aside class="editor-sidebar">
       <div class="sidebar-section">
-        <h3>Mis codigos guardados</h3>
+        <div class="saved-codes-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+          <h3 style="margin:0">Mis codigos guardados</h3>
+          <button id="btn-delete-all-saved" class="btn-secondary" type="button" title="Borrar todos definitivamente" style="padding:4px 8px;font-size:12px">Borrar todo</button>
+        </div>
         <ul id="saved-codes-list" class="saved-codes-list">
           <% savedCodes.forEach(function(c) { %>
           <li data-id="<%= c.id %>" data-lang="<%= c.language_slug %>" class="saved-code-item">
@@ -22,6 +25,17 @@
           <li class="saved-codes-empty">Todavia no guardaste ningun codigo.</li>
           <% } %>
         </ul>
+      </div>
+
+      <div id="confirm-delete-all-modal" class="cv-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center">
+        <div class="cv-modal" style="background:#1e1e2e;color:#eee;border:1px solid #333;border-radius:10px;padding:20px 22px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+          <h3 style="margin:0 0 10px;font-size:16px">Borrar todos los codigos</h3>
+          <p style="margin:0 0 18px;font-size:14px;line-height:1.4;color:#bbb">Seguro que queres borrar definitivamente todos tus codigos guardados? Esta accion no se puede deshacer.</p>
+          <div style="display:flex;justify-content:flex-end;gap:8px">
+            <button id="btn-cancel-delete-all" type="button" class="btn-secondary">No</button>
+            <button id="btn-confirm-delete-all" type="button" class="btn-primary" style="background:#c0392b;border-color:#c0392b">Si, borrar todo</button>
+          </div>
+        </div>
       </div>
     </aside>
 
@@ -49,6 +63,7 @@
       </div>
 
       <div class="editor-info">
+        <span id="language-info-chip" class="lang-chip">js</span>
         <span id="language-info-name">JavaScript</span>
         <span id="language-info-detail">indentacion: 2 espacios</span>
       </div>

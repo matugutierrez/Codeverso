@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head', { pageTitle: project.name + ' - Codeverso' }) %>
+</head>
+<body>
+  <%- include('partials/nav', { user: user, active: 'proyectos' }) %>
+
+  <main class="project-detail-layout">
+    <header class="project-detail-header">
+      <div>
+        <a href="/proyectos" class="back-link">&larr; Mis proyectos</a>
+        <h1><%= project.name %></h1>
+        <p class="muted"><%= project.description || 'Sin descripcion' %></p>
+      </div>
+    </header>
+
+    <div class="pd-body">
+      <aside class="pd-sidebar">
+        <h3>Explorador</h3>
+        <div class="file-tree" id="file-tree">
+          <% if (files.length === 0) { %>
+            <p class="muted" style="font-size:12px">Todavia no agregaste archivos.</p>
+          <% } else { %>
+            <%- treeHtml %>
+          <% } %>
+        </div>
+
+        <h4>Subir archivos o .zip</h4>
+        <% if (typeof uploadInfo !== 'undefined' && uploadInfo) { %>
+          <div class="upload-info">
+            <p>Se agregaron <b><%= uploadInfo.added %></b> archivo(s).</p>
+            <% if (uploadInfo.skipped && uploadInfo.skipped.length) { %>
+              <p class="muted">Omitidos: <%= uploadInfo.skipped.join(', ') %></p>
+            <% } %>
+          </div>
+        <% } %>
+        <form method="POST" action="/proyectos/<%= project.id %>/upload" enctype="multipart/form-data" class="add-file-form" id="upload-form">
+          <label class="file-drop" id="file-drop">
+            <input type="file" name="files" id="file-input" multiple hidden>
+            <div class="file-drop-inner">
+              <div class="file-drop-icon">&#x2191;</div>
+              <div class="file-drop-title">Arrastra archivos o <span class="file-drop-link">elegilos</span></div>
+              <div class="file-drop-hint">.zip preserva carpetas. Cualquier lenguaje. Max 8 MB c/u.</div>
+              <div class="file-drop-selected" id="file-drop-selected"></div>
+            </div>
+          </label>
+          <button type="submit" class="btn-primary" id="upload-btn" disabled>Subir</button>
+        </form>
+
+        <h4>Agregar desde codigos guardados</h4>
+        <% if (available.length === 0) { %>
+          <p class="muted" style="font-size:12px">No tenes mas codigos guardados para agregar.</p>
+        <% } else { %>
+          <form method="POST" action="/proyectos/<%= project.id %>/archivos" class="add-file-form">
+            <select name="code_id" required>
+              <% available.forEach(function(c) { %>
+                <option value="<%= c.id %>"><%= c.title %> (<%= c.language_slug %>)</option>
+              <% }) %>
+            </select>
+            <input type="text" name="filename" placeholder="Nombre archivo (opcional)">
+            <button type="submit" class="btn-primary">Agregar</button>
+          </form>
+        <% } %>
+      </aside>
+
+      <section class="pd-main">
+        <div class="preview-toolbar">
+          <h3>Vista previa</h3>
+          <div class="device-toggle" id="device-toggle">
+            <button type="button" data-dev="desktop" class="is-active" title="PC">PC</button>
+            <button type="button" data-dev="tablet" title="Tablet">Tablet</button>
+            <button type="button" data-dev="mobile" title="Movil">Movil</button>
+          </div>
+          <div class="editor-actions">
+            <button id="regen-demo" class="btn-secondary" type="button" title="Regenerar demo.html">Generar demo.html</button>
+            <button id="refresh-preview" class="btn-secondary" type="button" title="Refrescar">&#x21bb; Refrescar</button>
+            <a class="btn-primary" href="/proyectos/<%= project.id %>/download">Descargar .zip</a>
+          </div>
+        </div>
+        <div class="preview-frame-wrap" id="preview-wrap" data-dev="desktop">
+          <iframe id="project-preview" src="/proyectos/<%= project.id %>/preview" title="Vista previa"></iframe>
+        </div>
+
+        <div id="local-preview-modal" class="cv-modal-overlay local-preview-modal" aria-hidden="true">
+          <div class="cv-modal local-preview-card" role="dialog" aria-modal="true" aria-labelledby="local-preview-title">
+            <h3 id="local-preview-title">Este proyecto necesita correr localmente</h3>
+            <p>No se puede convertir automaticamente en un HTML real porque necesita dependencias, build y servidor/backend. Ejecuta estos comandos en la carpeta del proyecto y despues abre la URL local aca para verlo en vivo en el recuadro.</p>
+            <div class="local-command-list" id="local-command-list"></div>
+            <button id="copy-local-commands" class="btn-secondary" type="button">Copiar comandos</button>
+            <label class="local-url-row">
+              <span>URL local</span>
+              <input id="local-preview-url" type="text" spellcheck="false" value="http://localhost:5173">
+            </label>
+            <div class="local-preview-actions">
+              <button id="cancel-local-preview" class="btn-secondary" type="button">No</button>
+              <button id="open-local-preview" class="btn-primary" type="button">Si, abrir en el recuadro</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="editor-toolbar-bottom">
+          <h3 id="editor-title">Editor <span class="muted" style="font-weight:normal;font-size:12px">- elegi un archivo</span></h3>
+          <div class="editor-actions">
+            <span id="editor-status" class="muted"></span>
+            <button id="save-codear-btn" class="btn-secondary" type="button" disabled>Guardar en Codear libremente</button>
+            <button id="save-file-btn" class="btn-secondary" type="button" disabled>Guardar cambios</button>
+          </div>
+        </div>
+        <textarea id="file-editor" spellcheck="false" placeholder="Elegi un archivo del explorador para editarlo aca. Ctrl+S para guardar."></textarea>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const projectId = <%= project.id %>;
+      const tree = document.getElementById('file-tree');
+      const editor = document.getElementById('file-editor');
+      const title = document.getElementById('editor-title');
+      const status = document.getElementById('editor-status');
+      const saveBtn = document.getElementById('save-file-btn');
+      const saveCodearBtn = document.getElementById('save-codear-btn');
+      const preview = document.getElementById('project-preview');
+      const previewWrap = document.getElementById('preview-wrap');
+      const deviceToggle = document.getElementById('device-toggle');
+      let previewPlan = <%- JSON.stringify(previewPlan || {}).replace(/</g, '\\u003c') %>;
+      let currentPfId = null;
+      let dirty = false;
+
+      const localModal = document.getElementById('local-preview-modal');
+      const commandList = document.getElementById('local-command-list');
+      const localUrl = document.getElementById('local-preview-url');
+      const copyLocalCommands = document.getElementById('copy-local-commands');
+      const cancelLocalPreview = document.getElementById('cancel-local-preview');
+      const openLocalPreview = document.getElementById('open-local-preview');
+
+      function renderLocalCommands(plan) {
+        const commands = (plan && plan.commands && plan.commands.length) ? plan.commands : ['npm install', 'npm run build', 'npm run dev'];
+        commandList.innerHTML = commands.map(function (cmd, i) {
+          return '<div class="local-command"><span>' + (i + 1) + '</span><code>' + escapeHtml(cmd) + '</code></div>';
+        }).join('');
+        localUrl.value = (plan && plan.localUrl) || 'http://localhost:5173';
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+      }
+
+      function openLocalModal(plan) {
+        previewPlan = plan || previewPlan || {};
+        renderLocalCommands(previewPlan);
+        localModal.style.display = 'flex';
+        localModal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeLocalModal() {
+        localModal.style.display = 'none';
+        localModal.setAttribute('aria-hidden', 'true');
+      }
+
+      function openLiveLocalPreview() {
+        const url = (localUrl.value || '').trim();
+        if (!url) return;
+        preview.src = url;
+        closeLocalModal();
+      }
+
+      if (copyLocalCommands) {
+        copyLocalCommands.addEventListener('click', async function () {
+          const commands = ((previewPlan && previewPlan.commands) || []).join('\n');
+          if (navigator.clipboard && commands) await navigator.clipboard.writeText(commands);
+          copyLocalCommands.textContent = 'Copiado';
+          setTimeout(function () { copyLocalCommands.textContent = 'Copiar comandos'; }, 1000);
+        });
+      }
+      if (cancelLocalPreview) cancelLocalPreview.addEventListener('click', closeLocalModal);
+      if (openLocalPreview) openLocalPreview.addEventListener('click', openLiveLocalPreview);
+      if (localModal) localModal.addEventListener('click', function (e) { if (e.target === localModal) closeLocalModal(); });
+
+      // ---- Tree collapse ----
+      tree.addEventListener('click', function (e) {
+        const folderRow = e.target.closest('.ft-folder-row');
+        if (folderRow) {
+          folderRow.parentElement.classList.toggle('is-collapsed');
+          return;
+        }
+        const fileLi = e.target.closest('.ft-file');
+        if (fileLi) {
+          if (dirty && !confirm('Tenes cambios sin guardar. Descartar?')) return;
+          openFile(fileLi.dataset.pfId, fileLi.dataset.filename, fileLi.dataset.lang);
+        }
+      });
+
+      // ---- Device toggle ----
+      deviceToggle.addEventListener('click', function (e) {
+        const btn = e.target.closest('button[data-dev]');
+        if (!btn) return;
+        deviceToggle.querySelectorAll('button').forEach(b => b.classList.toggle('is-active', b === btn));
+        previewWrap.dataset.dev = btn.dataset.dev;
+      });
+
+      // ---- File drop / picker ----
+      const fileInput = document.getElementById('file-input');
+      const fileDrop = document.getElementById('file-drop');
+      const fileDropSelected = document.getElementById('file-drop-selected');
+      const uploadBtn = document.getElementById('upload-btn');
+      function updateSelected() {
+        const n = fileInput.files ? fileInput.files.length : 0;
+        uploadBtn.disabled = n === 0;
+        if (n === 0) { fileDropSelected.textContent = ''; return; }
+        const names = Array.from(fileInput.files).slice(0, 3).map(f => f.name).join(', ');
+        fileDropSelected.textContent = n + ' archivo(s): ' + names + (n > 3 ? '...' : '');
+      }
+      fileInput && fileInput.addEventListener('change', updateSelected);
+      if (fileDrop) {
+        ['dragenter','dragover'].forEach(ev => fileDrop.addEventListener(ev, e => { e.preventDefault(); fileDrop.classList.add('is-drag'); }));
+        ['dragleave','drop'].forEach(ev => fileDrop.addEventListener(ev, e => { e.preventDefault(); fileDrop.classList.remove('is-drag'); }));
+        fileDrop.addEventListener('drop', e => {
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            updateSelected();
+          }
+        });
+      }
+
+      function setStatus(msg, kind) {
+        status.textContent = msg || '';
+        status.style.color = kind === 'err' ? '#c00' : (kind === 'ok' ? '#080' : '#888');
+      }
+
+      async function openFile(pfId, filename, lang) {
+        setStatus('Cargando...', '');
+        try {
+          const r = await fetch('/proyectos/' + projectId + '/archivos/' + pfId + '/raw');
+          if (!r.ok) throw new Error('http ' + r.status);
+          const data = await r.json();
+          currentPfId = pfId;
+          editor.value = data.content || '';
+          title.innerHTML = 'Editor <span class="muted" style="font-weight:normal;font-size:12px">- ' + filename + ' (' + (lang || data.language_slug || '') + ')</span>';
+          saveBtn.disabled = false;
+          saveCodearBtn.disabled = false;
+          dirty = false;
+          setStatus('', '');
+          tree.querySelectorAll('.ft-file.is-active').forEach(li => li.classList.remove('is-active'));
+          const li = tree.querySelector('.ft-file[data-pf-id="' + pfId + '"]');
+          if (li) li.classList.add('is-active');
+        } catch (e) {
+          setStatus('Error al cargar', 'err');
+        }
+      }
+
+      editor.addEventListener('input', function () { dirty = true; setStatus('Modificado', ''); });
+
+      saveBtn.addEventListener('click', async function () {
+        if (!currentPfId) return;
+        saveBtn.disabled = true;
+        setStatus('Guardando...', '');
+        try {
+          const r = await fetch('/proyectos/' + projectId + '/archivos/' + currentPfId + '/contenido', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: editor.value })
+          });
+          if (!r.ok) throw new Error('http ' + r.status);
+          dirty = false;
+          setStatus('Guardado - refrescando preview', 'ok');
+          preview.src = '/proyectos/' + projectId + '/preview?t=' + Date.now();
+        } catch (e) {
+          setStatus('Error al guardar', 'err');
+        } finally {
+          saveBtn.disabled = false;
+        }
+      });
+
+      saveCodearBtn.addEventListener('click', async function () {
+        if (!currentPfId) return;
+        saveCodearBtn.disabled = true;
+        setStatus('Guardando copia en Codear libremente...', '');
+        try {
+          const r = await fetch('/proyectos/' + projectId + '/archivos/' + currentPfId + '/guardar-en-codear', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: editor.value })
+          });
+          if (!r.ok) throw new Error('http ' + r.status);
+          setStatus('Copia guardada en Codear libremente', 'ok');
+        } catch (e) {
+          setStatus('Error al guardar copia', 'err');
+        } finally {
+          saveCodearBtn.disabled = false;
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          if (!saveBtn.disabled) saveBtn.click();
+        }
+      });
+
+      document.getElementById('refresh-preview').addEventListener('click', function () {
+        preview.src = '/proyectos/' + projectId + '/preview?t=' + Date.now();
+      });
+
+      document.getElementById('regen-demo').addEventListener('click', async function () {
+        const btn = this;
+        btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Generando...';
+        try {
+          const r = await fetch('/proyectos/' + projectId + '/demo/regenerar', { method: 'POST' });
+          if (!r.ok) throw new Error('http ' + r.status);
+          const data = await r.json();
+          if (data.previewPlan) previewPlan = data.previewPlan;
+          preview.src = '/proyectos/' + projectId + '/preview?t=' + Date.now();
+          if (previewPlan && previewPlan.needsLocal) openLocalModal(previewPlan);
+          btn.textContent = 'Generado';
+          setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1200);
+        } catch (e) {
+          btn.textContent = 'Error'; setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
+        }
+      });
+
+      window.addEventListener('beforeunload', function (e) {
+        if (dirty) { e.preventDefault(); e.returnValue = ''; }
+      });
+    })();
+  </script>
+</body>
+</html>

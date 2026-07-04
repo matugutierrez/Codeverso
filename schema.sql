@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS saved_codes (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  code_source TEXT NOT NULL DEFAULT 'editor',
   language_slug TEXT NOT NULL,
   title TEXT NOT NULL,
   content TEXT NOT NULL DEFAULT '',
@@ -88,3 +89,22 @@ CREATE INDEX IF NOT EXISTS idx_goals_user ON learning_goals(user_id);
 CREATE INDEX IF NOT EXISTS idx_activity_user ON activity_log(user_id);
 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE saved_codes ADD COLUMN IF NOT EXISTS code_source TEXT NOT NULL DEFAULT 'editor';
+CREATE INDEX IF NOT EXISTS idx_saved_codes_user_source ON saved_codes(user_id, code_source);
+
+CREATE TABLE IF NOT EXISTS project_files (
+  id SERIAL PRIMARY KEY,
+  project_id INTEGER REFERENCES codeverso_projects(id) ON DELETE CASCADE,
+  code_id INTEGER REFERENCES saved_codes(id) ON DELETE CASCADE,
+  filename TEXT,
+  position INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(project_id, code_id)
+);
+CREATE INDEX IF NOT EXISTS idx_project_files_project ON project_files(project_id);
+
+UPDATE saved_codes sc
+   SET code_source = 'project'
+ WHERE EXISTS (SELECT 1 FROM project_files pf WHERE pf.code_id = sc.id)
+   AND sc.code_source = 'editor';
+

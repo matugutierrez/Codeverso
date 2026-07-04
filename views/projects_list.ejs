@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head', { pageTitle: 'Mis proyectos - Codeverso' }) %>
+</head>
+<body>
+  <%- include('partials/nav', { user: user, active: 'proyectos' }) %>
+
+  <main class="projects-layout">
+    <header class="projects-header">
+      <h1>Mis proyectos</h1>
+      <p class="muted">Agrupa archivos que guardaste en "Codear libremente" y arma paginas, apps o scripts completos. Si combinas HTML + CSS + JS, veras la vista previa en vivo.</p>
+    </header>
+
+    <section class="projects-new-card">
+      <h3>Crear un nuevo proyecto</h3>
+      <form method="POST" action="/proyectos" class="projects-new-form">
+        <input type="text" name="name" placeholder="Nombre del proyecto" required maxlength="80">
+        <input type="text" name="description" placeholder="Descripcion corta (opcional)" maxlength="160">
+        <button type="submit" class="btn-primary">Crear</button>
+      </form>
+    </section>
+
+    <section class="projects-grid">
+      <% if (projects.length === 0) { %>
+        <p class="muted">Todavia no creaste ningun proyecto.</p>
+      <% } %>
+      <% projects.forEach(function(p) { %>
+        <article class="project-card">
+          <a href="/proyectos/<%= p.id %>" class="project-card-link">
+            <h3><%= p.name %></h3>
+            <p class="project-desc"><%= p.description || 'Sin descripcion' %></p>
+            <p class="project-meta"><%= p.files_count %> archivo(s)</p>
+          </a>
+          <form method="POST" action="/proyectos/<%= p.id %>/eliminar" onsubmit="return confirm('Eliminar este proyecto?')">
+            <button type="submit" class="btn-link">Eliminar</button>
+          </form>
+        </article>
+      <% }) %>
+    </section>
+  </main>
+</body>
+</html>

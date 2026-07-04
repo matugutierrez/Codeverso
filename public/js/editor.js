@@ -79,8 +79,17 @@
   }
 
   function applyLanguage(config, keepContent) {
+    const prev = state.current
     state.current = config
     document.documentElement.style.setProperty('--accent', config.accent)
+    const wrapper = document.getElementById('code-editor-wrapper')
+    if (wrapper) {
+      if (prev && prev.slug) wrapper.classList.remove('lang-' + prev.slug)
+      wrapper.classList.add('lang-' + config.slug)
+      wrapper.dataset.lang = config.slug
+    }
+    const chip = $('language-info-chip')
+    if (chip) chip.textContent = config.slug
     $('language-info-name').textContent = config.name
     const unit = config.indentUnit === 'tabs' ? 'tabulaciones' : 'espacios'
     $('language-info-detail').textContent = 'indentacion: ' + config.indentSize + ' ' + unit
@@ -90,6 +99,7 @@
     }
     renderHighlight()
   }
+
 
   function resolveLanguageFromInput(text) {
     const byName = state.byName.get(text.trim().toLowerCase())
@@ -312,6 +322,12 @@
     const initial = state.bySlug.get((window.CODEVERSO_DEFAULT_LANG || 'javascript').toLowerCase()) || state.languages[0]
     applyLanguage(initial, false)
 
+    // Load a saved code when the URL includes ?open=<id>
+    const openId = new URLSearchParams(window.location.search).get('open')
+    if (openId) {
+      try { await loadSavedCode(openId) } catch (e) { setStatus('No se pudo abrir el archivo') }
+    }
+
     window.CodeversoLangDropdown.create({
       inputEl: els.langSelect,
       menuEl: els.langMenu,
@@ -366,6 +382,27 @@
         return
       }
       loadSavedCode(item.dataset.id)
+    })
+
+    const btnDelAll = document.getElementById('btn-delete-all-saved')
+    const modal = document.getElementById('confirm-delete-all-modal')
+    const btnCancel = document.getElementById('btn-cancel-delete-all')
+    const btnConfirm = document.getElementById('btn-confirm-delete-all')
+    function openModal() { if (modal) modal.style.display = 'flex' }
+    function closeModal() { if (modal) modal.style.display = 'none' }
+    if (btnDelAll) btnDelAll.addEventListener('click', openModal)
+    if (btnCancel) btnCancel.addEventListener('click', closeModal)
+    if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal() })
+    if (btnConfirm) btnConfirm.addEventListener('click', async () => {
+      btnConfirm.disabled = true
+      try {
+        await fetch('/codear/api/codigos/eliminar-todos', { method: 'POST' })
+        els.savedList.innerHTML = '<li class="saved-codes-empty">Todavia no guardaste ningun codigo.</li>'
+        state.savedId = null
+      } finally {
+        btnConfirm.disabled = false
+        closeModal()
+      }
     })
   }
 
