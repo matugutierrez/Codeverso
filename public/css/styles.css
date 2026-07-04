@@ -536,7 +536,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
   width: 100%; border: 1px solid var(--border-color); border-radius: 0 0 8px 8px;
   padding: 12px 14px; font-family: 'Share Tech Mono','Consolas','Courier New',monospace;
   font-size: 13px; line-height: 1.5; background: #0d0d0d; color: #e0e0e0;
-  resize: vertical; outline: none; min-height: 260px; tab-size: 2;
+  resize: vertical; outline: none;   min-height: 420px; tab-size: 2;
   white-space: pre; overflow: auto;
 }
 #file-editor:focus { border-color: var(--accent); }

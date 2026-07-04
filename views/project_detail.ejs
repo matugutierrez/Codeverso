@@ -165,7 +165,10 @@
         const url = (localUrl.value || '').trim();
         if (!url) return;
         preview.src = url;
-        closeLocalModal();
+        preview.onload = function () {
+          preview.onload = null;
+          closeLocalModal();
+        };
       }
 
       if (copyLocalCommands) {
