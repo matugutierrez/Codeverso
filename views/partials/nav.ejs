@@ -10,8 +10,10 @@
     <a href="/proyectos" class="<%= active === 'proyectos' ? 'active' : '' %>">Mis proyectos</a>
     <a href="/cuenta" class="<%= active === 'cuenta' ? 'active' : '' %>">Mi cuenta</a>
   </nav>
-  <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">🌙</button>
-  <script>(function(){var b=document.getElementById('theme-toggle');if(b&&document.documentElement.hasAttribute('data-theme')){b.textContent='💡'}})()</script>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
+    <svg class="theme-icon theme-moon" xmlns="http://www.w3.org/2000/svg" width="1.25rem" height="1.25rem" viewBox="0 0 24 24"><path fill="currentColor" d="M21.64 13a1 1 0 0 0-1.05-.14 8.05 8.05 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.6 8.6 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05m-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.8 9.8 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32Z"/></svg>
+    <svg class="theme-icon theme-lightbulb" xmlns="http://www.w3.org/2000/svg" width="1.25rem" height="1.25rem" viewBox="0 0 24 24"><path fill="currentColor" d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+  </button>
   <div class="nav-user">
     <span class="nav-username"><%= user.fullName %></span>
     <form action="/logout" method="POST">

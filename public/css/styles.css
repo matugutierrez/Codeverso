@@ -133,10 +133,15 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .nav-links a:hover { background: var(--nav-hover); text-decoration: none; }
 .nav-links a.active { background: var(--accent); color: var(--text-on-accent); }
 .theme-toggle {
-  background: none; border: none; font-size: 20px; line-height: 1; cursor: pointer;
+  background: none; border: none; cursor: pointer;
   padding: 4px 8px; border-radius: 4px; transition: background .12s;
+  display: flex; align-items: center;
 }
 .theme-toggle:hover { background: var(--nav-hover); }
+.theme-icon { display: block; }
+.theme-lightbulb { display: none; }
+[data-theme="dark"] .theme-moon { display: none; }
+[data-theme="dark"] .theme-lightbulb { display: block; }
 .nav-user { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-muted); }
 
 /* Auth pages */
