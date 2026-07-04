@@ -5,6 +5,10 @@
     return el
   }
 
+  function getCSSVar(name) {
+    try { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || null } catch (e) { return null }
+  }
+
   function barChart(container, data, options) {
     options = options || {}
     const width = container.clientWidth || 600
@@ -12,6 +16,7 @@
     const padding = 28
     const max = Math.max(1, ...data.map((d) => d.value))
     const barWidth = (width - padding * 2) / data.length
+    const textColor = getCSSVar('--text-muted') || '#a6adc8'
 
     const svg = svgEl('svg', { width: width, height: height, viewBox: '0 0 ' + width + ' ' + height })
 
@@ -32,7 +37,7 @@
         y: height - padding + 14,
         'text-anchor': 'middle',
         'font-size': '10',
-        fill: '#a6adc8'
+        fill: textColor
       })
       label.textContent = d.label
       svg.appendChild(label)
@@ -42,7 +47,7 @@
         y: y - 6,
         'text-anchor': 'middle',
         'font-size': '11',
-        fill: '#cdd6f4'
+        fill: textColor
       })
       valueLabel.textContent = d.value
       svg.appendChild(valueLabel)

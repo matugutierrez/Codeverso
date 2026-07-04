@@ -10,6 +10,8 @@
     <a href="/proyectos" class="<%= active === 'proyectos' ? 'active' : '' %>">Mis proyectos</a>
     <a href="/cuenta" class="<%= active === 'cuenta' ? 'active' : '' %>">Mi cuenta</a>
   </nav>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">🌙</button>
+  <script>(function(){var b=document.getElementById('theme-toggle');if(b&&document.documentElement.hasAttribute('data-theme')){b.textContent='💡'}})()</script>
   <div class="nav-user">
     <span class="nav-username"><%= user.fullName %></span>
     <form action="/logout" method="POST">
