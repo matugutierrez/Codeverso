@@ -141,7 +141,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .theme-icon { display: block; }
 .theme-lightbulb { display: none; }
 [data-theme="dark"] .theme-moon { display: none; }
-[data-theme="dark"] .theme-lightbulb { display: block; }
+[data-theme="dark"] .theme-lightbulb { display: block; color: #fff; }
 .nav-user { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-muted); }
 
 /* Auth pages */
@@ -170,7 +170,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .editor-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .editor-toolbar { display: flex; align-items: center; gap: 16px; padding: 10px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); flex-wrap: wrap; }
 .toolbar-group { display: flex; align-items: center; gap: 6px; }
-.toolbar-group label { font-size: 12px; color: #666; }
+.toolbar-group label { font-size: 12px; color: var(--text-muted); }
 .toolbar-toggle input { width: 15px; height: 15px; }
 .toolbar-spacer { flex: 1; }
 .code-title-input { width: 180px; }
@@ -347,7 +347,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .lang-dropdown-category { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-subtle); padding: 6px 8px 4px; }
 .lang-dropdown-item {
   display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
-  background: none; border: none; color: #1a1a1a; padding: 6px 10px; border-radius: 4px; font-size: 13px;
+  background: none; border: none; color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 13px;
 }
 .lang-dropdown-item:hover, .lang-dropdown-item.active { background: var(--nav-hover); }
 .lang-dropdown-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
@@ -522,7 +522,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 /* =========================================================
    Mis proyectos
    ========================================================= */
-.muted { color: #777; font-size: 13px; }
+.muted { color: var(--text-muted); font-size: 13px; }
 
 .projects-layout { max-width: 1100px; margin: 0 auto; padding: 32px 24px; display: flex; flex-direction: column; gap: 20px; }
 .projects-header h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: 1px; }
@@ -682,5 +682,5 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .file-drop-title { font-size: 12px; color: var(--text-primary); }
 .file-drop-link { color: var(--accent); text-decoration: underline; }
 .file-drop-hint { font-size: 11px; color: var(--text-subtle); line-height: 1.4; max-width: 240px; }
-.file-drop-selected { font-size: 11px; color: #0a6a0a; margin-top: 6px; word-break: break-all; }
+.file-drop-selected { font-size: 11px; color: var(--text-muted); margin-top: 6px; word-break: break-all; }
 
