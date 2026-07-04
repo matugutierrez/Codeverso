@@ -706,6 +706,10 @@ router.post('/', async (req, res) => {
 })
 
 router.post('/:id/eliminar', async (req, res) => {
+  await query(
+    `DELETE FROM saved_codes WHERE code_source = 'project' AND id IN (SELECT code_id FROM project_files WHERE project_id = $1)`,
+    [req.params.id]
+  )
   await query('DELETE FROM codeverso_projects WHERE id=$1 AND user_id=$2', [req.params.id, req.session.user.id])
   res.redirect('/proyectos')
 })
@@ -731,6 +735,7 @@ router.get('/:id', async (req, res) => {
   const available = await query(
     `SELECT id, title, language_slug FROM saved_codes
       WHERE user_id = $1
+        AND (code_source IS NULL OR code_source = 'editor')
         AND id NOT IN (SELECT code_id FROM project_files WHERE project_id = $2)
         AND NOT EXISTS (SELECT 1 FROM project_files pf_any WHERE pf_any.code_id = saved_codes.id)
       ORDER BY updated_at DESC`,
@@ -775,7 +780,11 @@ router.post('/:id/archivos', async (req, res) => {
 router.post('/:id/archivos/:fileId/eliminar', async (req, res) => {
   const own = await query('SELECT id FROM codeverso_projects WHERE id=$1 AND user_id=$2', [req.params.id, req.session.user.id])
   if (own.rows.length === 0) return res.status(404).json({ error: 'No encontrado' })
+  const pf = await query('SELECT code_id FROM project_files WHERE id=$1 AND project_id=$2', [req.params.fileId, req.params.id])
   await query('DELETE FROM project_files WHERE id=$1 AND project_id=$2', [req.params.fileId, req.params.id])
+  if (pf.rows.length) {
+    await query('DELETE FROM saved_codes WHERE id=$1 AND code_source=$2', [pf.rows[0].code_id, 'project'])
+  }
   await regenerateDemoIfNeeded(req.session.user.id, req.params.id)
   res.redirect('/proyectos/' + req.params.id)
 })

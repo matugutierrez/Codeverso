@@ -11,6 +11,7 @@ router.get('/', requireAuth, async (req, res) => {
     `SELECT id, language_slug, title, updated_at
        FROM saved_codes
       WHERE user_id = $1
+        AND code_source IS DISTINCT FROM 'project'
         AND NOT EXISTS (SELECT 1 FROM project_files pf WHERE pf.code_id = saved_codes.id)
       ORDER BY updated_at DESC`,
     [req.session.user.id]
@@ -54,6 +55,7 @@ router.post('/api/codigos/eliminar-todos', requireAuth, async (req, res) => {
   const result = await query(
     `DELETE FROM saved_codes
       WHERE user_id = $1
+        AND code_source IS DISTINCT FROM 'project'
         AND NOT EXISTS (SELECT 1 FROM project_files pf WHERE pf.code_id = saved_codes.id)`,
     [req.session.user.id]
   )

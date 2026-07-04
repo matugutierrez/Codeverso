@@ -9,7 +9,7 @@ const router = express.Router()
 router.get('/', requireAuth, async (req, res) => {
   const userId = req.session.user.id
 
-  const savedCodesCount = await query('SELECT COUNT(*) FROM saved_codes WHERE user_id = $1', [userId])
+  const savedCodesCount = await query('SELECT COUNT(*) FROM saved_codes WHERE user_id = $1 AND (code_source IS NULL OR code_source = $2)', [userId, 'editor'])
   const exercisesByLang = await query(
     `SELECT e.language_slug, COUNT(*) FILTER (WHERE p.status = 'completado') AS completados, COUNT(*) AS intentados
      FROM user_exercise_progress p JOIN exercises e ON e.id = p.exercise_id
@@ -59,6 +59,10 @@ router.post('/proyectos/:id/estado', requireAuth, async (req, res) => {
 })
 
 router.post('/proyectos/:id/eliminar', requireAuth, async (req, res) => {
+  await query(
+    `DELETE FROM saved_codes WHERE code_source = 'project' AND id IN (SELECT code_id FROM project_files WHERE project_id = $1)`,
+    [req.params.id]
+  )
   await query('DELETE FROM codeverso_projects WHERE id = $1 AND user_id = $2', [req.params.id, req.session.user.id])
   res.redirect('/cuenta')
 })
