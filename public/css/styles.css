@@ -684,3 +684,116 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .file-drop-hint { font-size: 11px; color: var(--text-subtle); line-height: 1.4; max-width: 240px; }
 .file-drop-selected { font-size: 11px; color: var(--text-muted); margin-top: 6px; word-break: break-all; }
 
+/* =========================================================
+   Responsive: Tablet (<= 900px)
+   ========================================================= */
+@media (max-width: 900px) {
+  .nav { gap: 12px; padding: 10px 16px; }
+  .nav-links a { padding: 6px 8px; font-size: 12px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .exercises-layout { padding: 20px 16px; }
+  .account-layout { padding: 20px 16px; }
+  .projects-layout { padding: 20px 16px; }
+  .project-detail-layout { padding: 14px; }
+  .auth-card { width: 90%; max-width: 380px; padding: 28px 24px; }
+  .editor-sidebar { padding: 12px; }
+  .editor-toolbar { padding: 8px 14px; gap: 10px; }
+  .editor-info { padding: 6px 14px; }
+  .code-editor-wrapper { font-size: 14px; }
+  .projects-grid { grid-template-columns: repeat(2, 1fr); }
+  .preview-toolbar { padding: 8px 10px; }
+  .editor-toolbar-bottom { padding: 8px 10px; }
+  #file-editor { min-height: 320px; }
+  .preview-frame-wrap { min-height: 360px; }
+}
+
+/* =========================================================
+   Responsive: Mobile (<= 600px)
+   ========================================================= */
+@media (max-width: 600px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+  .nav-links {
+    order: 3;
+    flex: 0 0 100%;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border-color);
+  }
+  .nav-links a { font-size: 11px; padding: 4px 8px; }
+  .nav-user { font-size: 11px; gap: 6px; }
+  .nav-brand { font-size: 14px; gap: 4px; }
+
+  .editor-sidebar { padding: 10px; }
+  .editor-toolbar { padding: 8px 10px; gap: 8px; }
+  .toolbar-group label { font-size: 11px; }
+  .code-title-input { width: 120px; }
+  .lang-dropdown-input { width: 140px; }
+  .editor-info { flex-wrap: wrap; gap: 8px; padding: 6px 10px; font-size: 11px; }
+  .code-editor-wrapper { font-size: 13px; border-left-width: 2px; }
+  .line-numbers { padding: 10px 6px; min-width: 28px; font-size: 12px; }
+  .code-input, .highlight-layer { padding: 10px 10px; }
+  .editor-status { padding: 4px 10px; font-size: 11px; }
+
+  .auth-card { width: 96%; padding: 24px 16px; border-radius: 8px; }
+  .auth-logo { font-size: 18px; }
+  .auth-subtitle { font-size: 13px; }
+
+  .exercises-layout { padding: 12px 10px; gap: 14px; }
+  .exercises-controls { padding: 10px; gap: 8px; }
+  .exercise-card { padding: 16px; }
+  .exercise-head { gap: 6px; }
+  .exercise-editor-wrapper { height: 200px; }
+  .exercise-actions { gap: 6px; }
+  .exercise-actions button { font-size: 12px; padding: 6px 12px; }
+
+  .account-layout { padding: 12px 10px; gap: 16px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-value { font-size: 22px; }
+  .account-section { padding: 14px 16px; }
+  .two-col { gap: 20px; }
+  .item-list { max-height: 240px; }
+  .item-list li { flex-direction: column; gap: 6px; }
+  .inline-form { flex-direction: column; }
+  .inline-form input, .inline-form select { min-width: 0; width: 100%; }
+  .data-table { font-size: 12px; }
+  .data-table th, .data-table td { padding: 6px 8px; }
+
+  .projects-layout { padding: 12px 10px; gap: 14px; }
+  .projects-header h1 { font-size: 20px; }
+  .projects-new-card { padding: 14px; }
+  .projects-new-form { flex-direction: column; }
+  .projects-new-form input[type=text] { min-width: 0; width: 100%; }
+  .projects-grid { grid-template-columns: 1fr; gap: 10px; }
+  .project-card { padding: 12px; }
+  .project-card h3 { font-size: 14px; }
+
+  .project-detail-header h1 { font-size: 18px; }
+  .pd-body { gap: 10px; }
+  .pd-sidebar { padding: 10px; max-height: 260px; }
+  .preview-toolbar { flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
+  .preview-toolbar h3 { font-size: 12px; }
+  .preview-toolbar .editor-actions { margin-left: 0; width: 100%; justify-content: flex-end; }
+  .editor-toolbar-bottom { flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
+  .editor-toolbar-bottom .editor-actions { margin-left: 0; width: 100%; justify-content: flex-end; }
+  #file-editor { font-size: 12px; padding: 10px; min-height: 200px; }
+  .device-toggle button { font-size: 10px; padding: 4px 8px; }
+  .local-preview-card { width: 96vw; padding: 16px; }
+  .local-command code { font-size: 11px; }
+  .device-floating { gap: 1px; padding: 3px; }
+  .device-floating button { padding: 4px 7px; }
+  .preview-frame-wrap { min-height: 240px; }
+  .preview-frame-wrap[data-dev="mobile"] { padding: 8px; }
+  .preview-frame-wrap[data-dev="tablet"] { padding: 8px; }
+  .preview-frame-wrap[data-dev="mobile"] #project-preview { max-width: 300px; border-radius: 12px; }
+  .preview-frame-wrap[data-dev="tablet"] #project-preview { max-width: 100%; border-radius: 4px; box-shadow: none; }
+
+  .error-page { padding: 40px 16px; }
+  .error-page h1 { font-size: 22px; }
+}
+
